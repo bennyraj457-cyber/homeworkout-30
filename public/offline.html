@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="theme-color" content="#E53935" />
+    <title>HomeFit 30 — Offline Fallback</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #FFFFFF;
+        color: #111827;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        max-width: 440px;
+        width: 100%;
+        background: #FFFFFF;
+        border: 2px solid #E53935;
+        border-radius: 12px;
+        padding: 28px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(17, 24, 39, 0.06);
+      }
+      .logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: #E53935;
+        color: #FFFFFF;
+        font-weight: 800;
+        font-size: 22px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+      }
+      .badge {
+        display: inline-block;
+        background: #FEF2F2;
+        border: 1px solid #FECACA;
+        color: #E53935;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 4px 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+      }
+      h1 {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: #111827;
+      }
+      p {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #4B5563;
+        margin-bottom: 20px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 48px;
+        background: #E53935;
+        color: #FFFFFF;
+        font-weight: 700;
+        font-size: 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+      }
+      .btn:hover { background: #D32F2F; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="logo">30</div>
+      <div><span class="badge">Offline Mode Ready</span></div>
+      <h1>You're offline. Your workouts are still available.</h1>
+      <p>
+        HomeFit 30 stores your workouts, exercises, active timer, and training history locally on your device.
+      </p>
+      <a href="/" class="btn">Open HomeFit 30 Dashboard</a>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,186 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* ==========================================================================
+     1. COLOR TOKENS — Predominantly White + Strategic Athletic Red (#E53935)
+     ========================================================================== */
+  
+  /* Primary Brand Red */
+  --hf-color-primary: #E53935;
+  --hf-color-primary-hover: #D32F2F;
+  --hf-color-primary-pressed: #C62828;
+  --hf-color-primary-light: #FEF2F2;
+  --hf-color-primary-tint: #FEE2E2;
+  --hf-color-primary-border: #FECACA;
+
+  /* Secondary / Athletic Slate & Neutral Accents */
+  --hf-color-secondary: #1E293B;
+  --hf-color-secondary-hover: #0F172A;
+  --hf-color-secondary-pressed: #020617;
+  --hf-color-secondary-light: #F1F5F9;
+
+  /* Backgrounds & Surfaces (Clean White-Dominant Architecture) */
+  --hf-bg-primary: #FFFFFF;
+  --hf-bg-card: #FFFFFF;
+  --hf-bg-subtle: #F8FAFC;
+  --hf-bg-input: #F9FAFB;
+  --hf-bg-input-focus: #FFFFFF;
+  --hf-bg-elevated: #FFFFFF;
+  --hf-bg-disabled: #F3F4F6;
+
+  /* Typography / Content Colors */
+  --hf-text-primary: #111827;
+  --hf-text-secondary: #4B5563;
+  --hf-text-tertiary: #6B7280;
+  --hf-text-disabled: #9CA3AF;
+  --hf-text-inverse: #FFFFFF;
+
+  /* Borders & Dividers */
+  --hf-border-subtle: #F1F5F9;
+  --hf-border-default: #E5E7EB;
+  --hf-border-strong: #D1D5DB;
+  --hf-border-focus: #E53935;
+
+  /* Semantic Status Colors */
+  --hf-color-success: #16A34A;
+  --hf-color-success-bg: #F0FDF4;
+  --hf-color-success-border: #BBF7D0;
+
+  --hf-color-warning: #D97706;
+  --hf-color-warning-bg: #FFFBEB;
+  --hf-color-warning-border: #FDE68A;
+
+  --hf-color-error: #DC2626;
+  --hf-color-error-bg: #FEF2F2;
+  --hf-color-error-border: #FECACA;
+
+  --hf-color-info: #2563EB;
+  --hf-color-info-bg: #EFF6FF;
+  --hf-color-info-border: #BFDBFE;
+
+  /* ==========================================================================
+     2. TYPOGRAPHY TOKENS
+     ========================================================================== */
+  --hf-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --hf-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Font Sizes & Line Heights */
+  --hf-text-display-size: 2.5rem;      /* 40px */
+  --hf-text-display-lh: 1.1;
+  --hf-text-h1-size: 1.875rem;         /* 30px */
+  --hf-text-h1-lh: 1.2;
+  --hf-text-h2-size: 1.375rem;         /* 22px */
+  --hf-text-h2-lh: 1.3;
+  --hf-text-h3-size: 1.125rem;         /* 18px */
+  --hf-text-h3-lh: 1.4;
+  --hf-text-body-size: 1rem;           /* 16px */
+  --hf-text-body-lh: 1.5;
+  --hf-text-support-size: 0.875rem;    /* 14px */
+  --hf-text-support-lh: 1.45;
+  --hf-text-label-size: 0.75rem;       /* 12px */
+  --hf-text-label-lh: 1.35;
+  --hf-text-meta-size: 0.6875rem;      /* 11px */
+  --hf-text-meta-lh: 1.25;
+
+  /* Workout Metric & Timer Sizes */
+  --hf-text-timer-xl: 3rem;            /* 48px */
+  --hf-text-timer-lg: 2.25rem;         /* 36px */
+  --hf-text-timer-md: 1.5rem;          /* 24px */
+
+  /* ==========================================================================
+     3. SPACING & LAYOUT TOKENS (4px Base Grid)
+     ========================================================================== */
+  --hf-space-1: 0.25rem;   /* 4px */
+  --hf-space-2: 0.5rem;    /* 8px */
+  --hf-space-3: 0.75rem;   /* 12px */
+  --hf-space-4: 1rem;      /* 16px */
+  --hf-space-5: 1.25rem;   /* 20px */
+  --hf-space-6: 1.5rem;    /* 24px */
+  --hf-space-8: 2rem;      /* 32px */
+  --hf-space-10: 2.5rem;   /* 40px */
+  --hf-space-12: 3rem;     /* 48px */
+  --hf-space-16: 4rem;     /* 64px */
+
+  /* Layout Structural Tokens */
+  --hf-page-margin-mobile: 1rem;       /* 16px */
+  --hf-page-margin-tablet: 1.5rem;     /* 24px */
+  --hf-page-margin-desktop: 2rem;      /* 32px */
+  --hf-card-padding-sm: 1rem;          /* 16px */
+  --hf-card-padding-md: 1.25rem;       /* 20px */
+  --hf-card-padding-lg: 1.5rem;        /* 24px */
+  --hf-section-gap: 2rem;              /* 32px */
+  --hf-grid-gap-sm: 0.75rem;           /* 12px */
+  --hf-grid-gap-md: 1rem;              /* 16px */
+  --hf-grid-gap-lg: 1.5rem;            /* 24px */
+
+  /* ==========================================================================
+     4. BORDER RADIUS & BORDERS (Structured Athletic Geometry, Never Cartoonish)
+     ========================================================================== */
+  --hf-radius-xs: 0.25rem;   /* 4px - small tags, progress ticks */
+  --hf-radius-sm: 0.375rem;  /* 6px - badges, small controls */
+  --hf-radius-md: 0.5rem;    /* 8px - buttons, inputs */
+  --hf-radius-lg: 0.75rem;   /* 12px - standard cards, modals */
+  --hf-radius-xl: 1rem;      /* 16px - hero workout containers */
+  --hf-radius-full: 9999px;  /* circular timers, status dots */
+
+  --hf-border-width-thin: 1px;
+  --hf-border-width-thick: 2px;
+
+  /* ==========================================================================
+     5. ELEVATION & SUBTLE SHADOWS (Clean & Crisp — No Excessive Drop Shadows)
+     ========================================================================== */
+  --hf-shadow-xs: 0 1px 2px 0 rgba(17, 24, 39, 0.03);
+  --hf-shadow-sm: 0 1px 3px 0 rgba(17, 24, 39, 0.05), 0 1px 2px -1px rgba(17, 24, 39, 0.03);
+  --hf-shadow-md: 0 4px 6px -1px rgba(17, 24, 39, 0.05), 0 2px 4px -2px rgba(17, 24, 39, 0.03);
+  --hf-shadow-lg: 0 10px 15px -3px rgba(17, 24, 39, 0.06), 0 4px 6px -4px rgba(17, 24, 39, 0.04);
+  --hf-shadow-brand: 0 2px 6px 0 rgba(229, 57, 53, 0.18);
+
+  /* ==========================================================================
+     6. COMPONENT SIZING & BREAKPOINTS
+     ========================================================================== */
+  --hf-control-height-sm: 2.25rem;     /* 36px */
+  --hf-control-height-md: 2.75rem;     /* 44px - Mobile tap target baseline */
+  --hf-control-height-lg: 3.25rem;     /* 52px - Primary workout CTA */
+  --hf-nav-bottom-height: 4rem;        /* 64px */
+  --hf-nav-top-height: 3.75rem;        /* 60px */
+  --hf-nav-sidebar-width: 16rem;       /* 256px */
+
+  --hf-bp-mobile: 375px;
+  --hf-bp-tablet: 768px;
+  --hf-bp-desktop: 1024px;
+  --hf-bp-wide: 1280px;
+}
+
+@layer base {
+  body {
+    font-family: var(--hf-font-sans);
+    background-color: var(--hf-bg-primary);
+    color: var(--hf-text-primary);
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Tabular numerals for timers, rep counters, weight selectors */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Custom subtle scrollbars for code & horizontal scrolls */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F8FAFC;
+}
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
