@@ -17,7 +17,12 @@ import {
   NavItemSpec,
 } from '../design-system/components/Navigation';
 import { ConfirmationDialog } from '../design-system/components/FeedbackComponents';
-import { resetAllWorkoutDataAndCaches } from '../services/workoutStorage';
+import {
+  resetAllWorkoutDataAndCaches,
+  loadCompletedWorkoutHistory,
+  calculateWeeklyActivity,
+  loadPersonalGoals,
+} from '../services/workoutStorage';
 import {
   ConnectionStatusPill,
   HeaderInstallAction,
@@ -101,6 +106,10 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
     year: 'numeric',
   }).format(new Date());
 
+  const history = loadCompletedWorkoutHistory();
+  const weeklyActivity = calculateWeeklyActivity(history, 0);
+  const personalGoals = loadPersonalGoals();
+
   return (
     <div className="min-h-screen bg-white text-[#111827] flex flex-col lg:flex-row">
       {/* Desktop Left Sidebar Navigation (Visible on lg: 1024px+) */}
@@ -110,6 +119,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
             activeTab={activeTab}
             onSelect={handleSelectTab}
             items={APP_NAV_ITEMS}
+            weeklyCompletedDays={weeklyActivity.activeDaysInWeek}
+            weeklyTargetDays={personalGoals.weeklyWorkoutDaysGoal}
+            weeklyCompletedMinutes={weeklyActivity.totalMinutesInWeek}
           />
           {/* Extra Footer Links in Sidebar: Reset Data & UI Design System */}
           <div className="px-4 pb-4 space-y-2 bg-white border-r border-[#E5E7EB]">

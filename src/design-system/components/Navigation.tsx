@@ -111,13 +111,23 @@ export interface DesktopSidebarNavProps {
   activeTab: NavItemId;
   onSelect: (id: NavItemId) => void;
   items?: NavItemSpec[];
+  weeklyCompletedDays?: number;
+  weeklyTargetDays?: number;
+  weeklyCompletedMinutes?: number;
 }
 
 export const DesktopSidebarNav: React.FC<DesktopSidebarNavProps> = ({
   activeTab,
   onSelect,
   items = DEFAULT_NAV_ITEMS,
+  weeklyCompletedDays = 0,
+  weeklyTargetDays = 6,
+  weeklyCompletedMinutes = 0,
 }) => {
+  const pct = Math.min(
+    100,
+    Math.round((weeklyCompletedDays / Math.max(1, weeklyTargetDays)) * 100)
+  );
   return (
     <aside
       aria-label="Desktop Sidebar Navigation"
@@ -206,14 +216,17 @@ export const DesktopSidebarNav: React.FC<DesktopSidebarNavProps> = ({
               Weekly Target
             </span>
             <span className="inline-flex items-center gap-1 text-[12px] font-bold text-[#E53935]">
-              <Flame className="w-3.5 h-3.5 fill-[#E53935]" /> 4 / 5 Days
+              <Flame className="w-3.5 h-3.5 fill-[#E53935]" /> {weeklyCompletedDays} / {weeklyTargetDays} Days
             </span>
           </div>
           <div className="w-full h-1.5 bg-[#E5E7EB] rounded-full overflow-hidden">
-            <div className="h-full bg-[#E53935] rounded-full w-4/5" />
+            <div
+              className="h-full bg-[#E53935] rounded-full transition-all"
+              style={{ width: `${pct}%` }}
+            />
           </div>
           <p className="mt-2 text-[12px] text-[#4B5563] font-medium">
-            120 mins completed this week
+            {weeklyCompletedMinutes} mins completed this week
           </p>
         </div>
       </div>

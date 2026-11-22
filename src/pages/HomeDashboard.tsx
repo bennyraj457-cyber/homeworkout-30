@@ -27,10 +27,7 @@ import {
   ExerciseCategoryCard,
 } from '../design-system/components/Cards';
 import {
-  WEEKLY_ACTIVITY_SAMPLE,
-  QUICK_STATS_SAMPLE,
   EXERCISE_CATEGORIES_SAMPLE,
-  RECENT_ACTIVITY_SAMPLE,
   MuscleCategorySlug,
 } from '../data/dashboardSampleData';
 import {
@@ -89,12 +86,8 @@ export const HomeDashboard: React.FC = () => {
     : null;
 
   const savedHistory = loadCompletedWorkoutHistory();
-  const hasRealHistory = savedHistory.length > 0;
-  const realStats = hasRealHistory
-    ? calculateOverallProgressStatistics(savedHistory)
-    : null;
+  const realStats = calculateOverallProgressStatistics(savedHistory);
   const currentWeekActivity = calculateWeeklyActivity(savedHistory, 0);
-  const realWeekly = hasRealHistory ? currentWeekActivity : null;
   const userGoals = loadPersonalGoals();
 
   // Resolve Selected Day's Scheduled Workout from the Repeating 7-Day Weekly Plan (defaults to Today)
@@ -122,13 +115,9 @@ export const HomeDashboard: React.FC = () => {
   const todaysDaySchedule = selectedDaySchedule;
   const todaysScheduledPlan = selectedDayPlan;
 
-  const displayedCompletedDays = realWeekly
-    ? realWeekly.activeDaysInWeek
-    : WEEKLY_ACTIVITY_SAMPLE.completedDays;
+  const displayedCompletedDays = currentWeekActivity.activeDaysInWeek;
   const displayedTargetDays = userGoals.weeklyWorkoutDaysGoal;
-  const displayedTotalMinutesInWeek = realWeekly
-    ? realWeekly.totalMinutesInWeek
-    : WEEKLY_ACTIVITY_SAMPLE.totalMinutesCompleted;
+  const displayedTotalMinutesInWeek = currentWeekActivity.totalMinutesInWeek;
   const displayedTargetMinutesInWeek = userGoals.weeklyWorkoutMinutesGoal;
 
   const weeklyProgressPercent = Math.min(
@@ -381,7 +370,7 @@ export const HomeDashboard: React.FC = () => {
                 </h2>
               </div>
               <span className="px-2 py-0.5 rounded-[5px] bg-[#F8FAFC] border border-[#E5E7EB] text-[10px] font-bold uppercase tracking-wider text-[#6B7280] shrink-0">
-                {hasRealHistory ? 'Live Data' : 'Sample Data'}
+                Live Data
               </span>
             </div>
 
@@ -445,9 +434,9 @@ export const HomeDashboard: React.FC = () => {
               <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
                 {REPEATING_WEEKLY_SCHEDULE.map((schedDay, idx) => {
                   const dayBucket = currentWeekActivity.days[idx];
-                  const isCompleted = hasRealHistory
-                    ? dayBucket.workoutsCount > 0
-                    : WEEKLY_ACTIVITY_SAMPLE.days[idx]?.status === 'completed';
+                  const isCompleted = Boolean(
+                    dayBucket && dayBucket.workoutsCount > 0
+                  );
                   const isRealToday = schedDay.jsDayOfWeek === todayJsDay;
                   const isSelected = schedDay.jsDayOfWeek === selectedJsDay;
                   const assignedPlan =
@@ -700,7 +689,7 @@ export const HomeDashboard: React.FC = () => {
       </section>
 
       {/* =====================================================================
-          SECTION 4: QUICK STATISTICS (3 Cards with Live or Demo Data Badge)
+          SECTION 4: QUICK STATISTICS (3 Cards with Live Local Data)
           ===================================================================== */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
@@ -714,54 +703,41 @@ export const HomeDashboard: React.FC = () => {
           </div>
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-[#F8FAFC] border border-[#E5E7EB] text-[11px] font-bold uppercase tracking-wider text-[#6B7280]">
             <Info className="w-3.5 h-3.5 text-[#E53935]" />
-            {hasRealHistory ? 'Live Local Data' : 'Demo Data'}
+            Live Local Data
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {realStats ? (
-            <>
-              <StatisticsCard
-                label="Workouts Completed"
-                value={String(realStats.totalWorkoutsCompleted)}
-                unit={realStats.totalWorkoutsCompleted === 1 ? 'Session' : 'Sessions'}
-                trend={`${realStats.totalSetsCompleted} sets logged`}
-                trendPositive
-                accentRed
-                icon={STAT_ICON_MAP['workouts-completed']}
-              />
-              <StatisticsCard
-                label="Total Workout Minutes"
-                value={String(realStats.totalWorkoutMinutes)}
-                unit="Mins"
-                trend={`${formatSecondsToMMSS(realStats.totalWorkoutSeconds)} exact time`}
-                trendPositive
-                icon={STAT_ICON_MAP['total-minutes']}
-              />
-              <StatisticsCard
-                label="Current Workout Streak"
-                value={String(realStats.currentStreakDays)}
-                unit={realStats.currentStreakDays === 1 ? 'Day' : 'Days'}
-                trend={`Longest Streak: ${realStats.longestStreakDays}d`}
-                trendPositive
-                accentRed
-                icon={STAT_ICON_MAP['current-streak']}
-              />
-            </>
-          ) : (
-            QUICK_STATS_SAMPLE.map((stat) => (
-              <StatisticsCard
-                key={stat.id}
-                label={stat.label}
-                value={stat.value}
-                unit={stat.unit}
-                trend={stat.trend}
-                trendPositive
-                accentRed={stat.accentRed}
-                icon={STAT_ICON_MAP[stat.id]}
-              />
-            ))
-          )}
+          <StatisticsCard
+            label="Workouts Completed"
+            value={String(realStats.totalWorkoutsCompleted)}
+            unit={realStats.totalWorkoutsCompleted === 1 ? 'Session' : 'Sessions'}
+            trend={
+              realStats.totalWorkoutsCompleted > 0
+                ? `${realStats.totalSetsCompleted} sets logged`
+                : '0 sets logged'
+            }
+            trendPositive
+            accentRed
+            icon={STAT_ICON_MAP['workouts-completed']}
+          />
+          <StatisticsCard
+            label="Total Workout Minutes"
+            value={String(realStats.totalWorkoutMinutes)}
+            unit="Mins"
+            trend={`${formatSecondsToMMSS(realStats.totalWorkoutSeconds)} exact time`}
+            trendPositive
+            icon={STAT_ICON_MAP['total-minutes']}
+          />
+          <StatisticsCard
+            label="Current Workout Streak"
+            value={String(realStats.currentStreakDays)}
+            unit={realStats.currentStreakDays === 1 ? 'Day' : 'Days'}
+            trend={`Longest Streak: ${realStats.longestStreakDays}d`}
+            trendPositive
+            accentRed
+            icon={STAT_ICON_MAP['current-streak']}
+          />
         </div>
       </section>
 
@@ -833,117 +809,79 @@ export const HomeDashboard: React.FC = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-[12px] border border-[#E5E7EB] divide-y divide-[#F1F5F9] shadow-hf-xs overflow-hidden">
-          {savedHistory.slice(0, 3).map((entry) => {
-            const formattedDate = new Intl.DateTimeFormat('en-US', {
-              weekday: 'long',
-              month: 'short',
-              day: 'numeric',
-            }).format(new Date(entry.finishedAt));
+        {savedHistory.length === 0 ? (
+          <div className="bg-white rounded-[12px] border border-dashed border-[#D1D5DB] p-6 text-center">
+            <p className="text-[14px] font-bold text-[#111827]">
+              No Completed Workouts Logged Yet
+            </p>
+            <p className="text-[13px] font-medium text-[#6B7280] mt-1">
+              Complete any workout from your weekly plan to see your recent activity here.
+            </p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-[12px] border border-[#E5E7EB] divide-y divide-[#F1F5F9] shadow-hf-xs overflow-hidden">
+            {savedHistory.slice(0, 3).map((entry) => {
+              const formattedDate = new Intl.DateTimeFormat('en-US', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+              }).format(new Date(entry.finishedAt));
 
-            return (
-              <div
-                key={entry.sessionId}
-                onClick={() => navigate(`/progress/${entry.sessionId}`)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) =>
-                  e.key === 'Enter' && navigate(`/progress/${entry.sessionId}`)
-                }
-                className="p-4 sm:p-5 bg-[#FEF2F2]/30 hover:bg-[#FEF2F2]/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer"
-              >
-                <div className="flex items-start sm:items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-[10px] bg-[#E53935] text-white flex items-center justify-center shrink-0">
-                    <Dumbbell className="w-5 h-5" strokeWidth={2.25} />
+              return (
+                <div
+                  key={entry.sessionId}
+                  onClick={() => navigate(`/progress/${entry.sessionId}`)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) =>
+                    e.key === 'Enter' && navigate(`/progress/${entry.sessionId}`)
+                  }
+                  className="p-4 sm:p-5 bg-[#FEF2F2]/30 hover:bg-[#FEF2F2]/60 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer"
+                >
+                  <div className="flex items-start sm:items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-[10px] bg-[#E53935] text-white flex items-center justify-center shrink-0">
+                      <Dumbbell className="w-5 h-5" strokeWidth={2.25} />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-[15px] sm:text-[16px] font-bold text-[#111827]">
+                          {entry.workoutName}
+                        </h3>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#F0FDF4] border border-[#BBF7D0] text-[#16A34A] text-[11px] font-bold uppercase tracking-wider">
+                          <CheckCircle2 className="w-3 h-3" strokeWidth={2.5} />
+                          Completed ({entry.completionPercentage}%)
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-medium text-[#6B7280] mt-1">
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-[#E53935]" />
+                          {formattedDate}
+                        </span>
+                        <span>•</span>
+                        <span>
+                          {entry.category} • {entry.totalRepetitions} Reps
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-[15px] sm:text-[16px] font-bold text-[#111827]">
-                        {entry.workoutName}
-                      </h3>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#F0FDF4] border border-[#BBF7D0] text-[#16A34A] text-[11px] font-bold uppercase tracking-wider">
-                        <CheckCircle2 className="w-3 h-3" strokeWidth={2.5} />
-                        Completed ({entry.completionPercentage}%)
+
+                  <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#F1F5F9]">
+                    <div className="flex items-center gap-2 font-mono tabular-nums">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-[#FEF2F2] border border-[#FECACA] text-[#E53935] text-[12px] font-bold">
+                        <Clock className="w-3.5 h-3.5" strokeWidth={2.25} />
+                        {formatSecondsToMMSS(entry.actualDurationSeconds)}
+                      </span>
+                      <span className="px-2.5 py-1 rounded-[6px] bg-white border border-[#E5E7EB] text-[#111827] text-[12px] font-bold">
+                        {entry.completedSets} / {entry.totalSets} Sets
                       </span>
                     </div>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-medium text-[#6B7280] mt-1">
-                      <span className="inline-flex items-center gap-1">
-                        <Calendar className="w-3.5 h-3.5 text-[#E53935]" />
-                        {formattedDate}
-                      </span>
-                      <span>•</span>
-                      <span>
-                        {entry.category} • {entry.totalRepetitions} Reps
-                      </span>
-                    </div>
+                    <ChevronRight className="w-4 h-4 text-[#9CA3AF]" strokeWidth={2.25} />
                   </div>
                 </div>
-
-                <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#F1F5F9]">
-                  <div className="flex items-center gap-2 font-mono tabular-nums">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-[#FEF2F2] border border-[#FECACA] text-[#E53935] text-[12px] font-bold">
-                      <Clock className="w-3.5 h-3.5" strokeWidth={2.25} />
-                      {formatSecondsToMMSS(entry.actualDurationSeconds)}
-                    </span>
-                    <span className="px-2.5 py-1 rounded-[6px] bg-white border border-[#E5E7EB] text-[#111827] text-[12px] font-bold">
-                      {entry.completedSets} / {entry.totalSets} Sets
-                    </span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[#9CA3AF]" strokeWidth={2.25} />
-                </div>
-              </div>
-            );
-          })}
-
-          {RECENT_ACTIVITY_SAMPLE.slice(0, Math.max(0, 3 - savedHistory.length)).map((workout) => (
-            <div
-              key={workout.id}
-              onClick={() => navigate('/progress')}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && navigate('/progress')}
-              className="p-4 sm:p-5 hover:bg-[#F8FAFC] transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer"
-            >
-              <div className="flex items-start sm:items-center gap-3.5">
-                <div className="w-11 h-11 rounded-[10px] bg-[#FEF2F2] border border-[#FECACA] text-[#E53935] flex items-center justify-center shrink-0">
-                  <Dumbbell className="w-5 h-5" strokeWidth={2.25} />
-                </div>
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-[15px] sm:text-[16px] font-bold text-[#111827]">
-                      {workout.workoutName}
-                    </h3>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#F0FDF4] border border-[#BBF7D0] text-[#16A34A] text-[11px] font-bold uppercase tracking-wider">
-                      <CheckCircle2 className="w-3 h-3" strokeWidth={2.5} />
-                      {workout.status}
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] font-medium text-[#6B7280] mt-1">
-                    <span className="inline-flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-[#9CA3AF]" />
-                      {workout.dateLabel}
-                    </span>
-                    <span>•</span>
-                    <span>{workout.focusTag}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-[#F1F5F9]">
-                <div className="flex items-center gap-2 font-mono tabular-nums">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-[#FEF2F2] border border-[#FECACA] text-[#E53935] text-[12px] font-bold">
-                    <Clock className="w-3.5 h-3.5" strokeWidth={2.25} />
-                    {workout.duration}
-                  </span>
-                  <span className="px-2.5 py-1 rounded-[6px] bg-[#F8FAFC] border border-[#E5E7EB] text-[#111827] text-[12px] font-bold">
-                    {workout.setsCompleted}
-                  </span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-[#9CA3AF]" strokeWidth={2.25} />
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* =====================================================================
