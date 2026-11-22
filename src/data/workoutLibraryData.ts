@@ -51,6 +51,114 @@ export interface WorkoutPlan {
   exercises: WorkoutExerciseStep[];
 }
 
+export interface RepeatingWeeklyDayPlan {
+  dayIndex: number; // 1 = Monday ... 7 = Sunday (0 in JS getDay() is mapped to 7)
+  jsDayOfWeek: number; // 1 = Mon, 2 = Tue, ..., 6 = Sat, 0 = Sun
+  dayName: string;
+  dayShort: string;
+  isRestDay: boolean;
+  focusTitle: string;
+  focusSubtitle: string;
+  planId: string;
+}
+
+/**
+ * Repeating 7-Day Weekly Schedule (Repeats Every Week)
+ * 6 Workout Days (Monday – Saturday) + 1 Active Rest / Stretch Day (Sunday)
+ * Balanced Muscle Split + Full Body
+ */
+export const REPEATING_WEEKLY_SCHEDULE: RepeatingWeeklyDayPlan[] = [
+  {
+    dayIndex: 1,
+    jsDayOfWeek: 1,
+    dayName: 'Monday',
+    dayShort: 'MON',
+    isRestDay: false,
+    focusTitle: 'Full Body Foundation',
+    focusSubtitle: 'Compound squats, push-ups, rows, overhead press & plank',
+    planId: 'full-body-workout-a',
+  },
+  {
+    dayIndex: 2,
+    jsDayOfWeek: 2,
+    dayName: 'Tuesday',
+    dayShort: 'TUE',
+    isRestDay: false,
+    focusTitle: 'Upper Body Push & Pull',
+    focusSubtitle: 'Barbell rows, shoulder press, push-ups, lats & biceps',
+    planId: 'upper-body-strength',
+  },
+  {
+    dayIndex: 3,
+    jsDayOfWeek: 3,
+    dayName: 'Wednesday',
+    dayShort: 'WED',
+    isRestDay: false,
+    focusTitle: 'Lower Body Power',
+    focusSubtitle: 'Barbell squats, deadlifts, lunges & trunk stability',
+    planId: 'leg-strength',
+  },
+  {
+    dayIndex: 4,
+    jsDayOfWeek: 4,
+    dayName: 'Thursday',
+    dayShort: 'THU',
+    isRestDay: false,
+    focusTitle: 'Core, Abs & Stability',
+    focusSubtitle: 'Leg raises, isometric planks, mountain climbers & anti-rotation',
+    planId: 'abs-and-stability',
+  },
+  {
+    dayIndex: 5,
+    jsDayOfWeek: 5,
+    dayName: 'Friday',
+    dayShort: 'FRI',
+    isRestDay: false,
+    focusTitle: 'Full Body Posterior & Hypertrophy',
+    focusSubtitle: 'Barbell deadlifts, rows, push-ups, delts & arm peak',
+    planId: 'full-body-workout-b',
+  },
+  {
+    dayIndex: 6,
+    jsDayOfWeek: 6,
+    dayName: 'Saturday',
+    dayShort: 'SAT',
+    isRestDay: false,
+    focusTitle: 'Full Body Athletic Conditioning',
+    focusSubtitle: 'High-density squats, shoulder press, lunges & mountain climbers',
+    planId: 'full-body-workout-c',
+  },
+  {
+    dayIndex: 7,
+    jsDayOfWeek: 0,
+    dayName: 'Sunday',
+    dayShort: 'SUN',
+    isRestDay: true,
+    focusTitle: 'Rest Day & Optional Full-Body Stretch',
+    focusSubtitle: 'Muscle recovery day • Optional 15-min decompression stretch flow',
+    planId: 'full-body-stretch',
+  },
+];
+
+/**
+ * Resolve today's scheduled day entry and workout plan from the repeating weekly schedule
+ */
+export function getTodaysScheduledPlan(referenceDate: Date = new Date()): {
+  daySchedule: RepeatingWeeklyDayPlan;
+  workoutPlan: WorkoutPlan;
+} {
+  const jsDay = referenceDate.getDay(); // 0 (Sun) to 6 (Sat)
+  const daySchedule =
+    REPEATING_WEEKLY_SCHEDULE.find((d) => d.jsDayOfWeek === jsDay) ||
+    REPEATING_WEEKLY_SCHEDULE[0];
+
+  const workoutPlan =
+    WORKOUT_PLANS_DATA.find((p) => p.id === daySchedule.planId) ||
+    WORKOUT_PLANS_DATA[0];
+
+  return { daySchedule, workoutPlan };
+}
+
 export const WORKOUT_CATEGORY_TABS: WorkoutCategoryFilter[] = [
   'All',
   'Full Body',

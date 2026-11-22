@@ -11,6 +11,8 @@ import {
   X,
   Activity,
   Sparkles,
+  Calendar,
+  Play,
 } from 'lucide-react';
 import { Button } from '../design-system/components/Buttons';
 import { TextInput } from '../design-system/components/FormComponents';
@@ -19,6 +21,7 @@ import { ExerciseIllustration } from '../design-system/components/ExerciseVisual
 import {
   WORKOUT_PLANS_DATA,
   WORKOUT_CATEGORY_TABS,
+  REPEATING_WEEKLY_SCHEDULE,
   WorkoutCategoryFilter,
   WorkoutPlan,
 } from '../data/workoutLibraryData';
@@ -183,6 +186,95 @@ export const WorkoutLibrary: React.FC = () => {
               })}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          REPEATING 7-DAY WEEKLY WORKOUT PLAN (Mon–Sat Training + Sun Rest)
+          ===================================================================== */}
+      <section className="bg-white rounded-[12px] border-2 border-[#E53935] p-5 sm:p-6 shadow-hf-xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#F1F5F9]">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.05em] text-[#E53935]">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Master Weekly Routine • Repeats Every Week</span>
+            </div>
+            <h2 className="text-[20px] font-extrabold text-[#111827] mt-0.5">
+              Monday – Sunday Repeating Workout Schedule
+            </h2>
+            <p className="text-[13px] font-medium text-[#4B5563]">
+              6 Workout Days (Balanced Muscle Split + Full Body) and 1 Sunday Rest / Stretch Day.
+            </p>
+          </div>
+          <span className="px-3 py-1 rounded-[6px] bg-[#FEF2F2] border border-[#FECACA] font-mono text-[12px] font-bold text-[#E53935]">
+            6 Days On • 1 Day Rest
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+          {REPEATING_WEEKLY_SCHEDULE.map((dayItem) => {
+            const assignedPlan =
+              WORKOUT_PLANS_DATA.find((p) => p.id === dayItem.planId) ||
+              WORKOUT_PLANS_DATA[0];
+            const isTodayDay = dayItem.jsDayOfWeek === new Date().getDay();
+
+            return (
+              <div
+                key={dayItem.dayShort}
+                className={`p-3.5 rounded-[10px] border flex flex-col justify-between transition-all ${
+                  isTodayDay
+                    ? 'bg-[#FEF2F2] border-2 border-[#E53935]'
+                    : dayItem.isRestDay
+                    ? 'bg-[#F8FAFC] border-[#E5E7EB]'
+                    : 'bg-white border-[#E5E7EB]'
+                }`}
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-1 mb-2">
+                    <span
+                      className={`font-mono text-[11px] font-extrabold uppercase px-2 py-0.5 rounded-[4px] ${
+                        isTodayDay
+                          ? 'bg-[#E53935] text-white'
+                          : 'bg-[#F1F5F9] text-[#111827]'
+                      }`}
+                    >
+                      {dayItem.dayName}
+                    </span>
+                    <span className="font-mono text-[11px] font-bold text-[#E53935]">
+                      {dayItem.isRestDay ? 'Rest' : `${assignedPlan.durationMinutes}m`}
+                    </span>
+                  </div>
+
+                  <h3 className="text-[14px] font-extrabold text-[#111827] leading-snug">
+                    {dayItem.isRestDay ? 'Rest & Stretch' : assignedPlan.name}
+                  </h3>
+                  <p className="text-[11px] font-semibold text-[#E53935] mt-0.5">
+                    {dayItem.focusTitle}
+                  </p>
+                </div>
+
+                <div className="mt-3 pt-2.5 border-t border-[#F1F5F9] flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      navigate(`/workout/active?plan=${assignedPlan.id}`)
+                    }
+                    className="flex-1 py-1.5 px-2 rounded-[6px] bg-[#E53935] hover:bg-[#D32F2F] text-white text-[11px] font-bold inline-flex items-center justify-center gap-1 transition-colors"
+                  >
+                    <Play className="w-3 h-3 fill-current" />
+                    <span>{dayItem.isRestDay ? 'Stretch' : 'Start'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/workouts/${assignedPlan.id}`)}
+                    className="py-1.5 px-2 rounded-[6px] bg-white hover:bg-[#F8FAFC] border border-[#E5E7EB] text-[#111827] text-[11px] font-bold transition-colors"
+                  >
+                    View
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 

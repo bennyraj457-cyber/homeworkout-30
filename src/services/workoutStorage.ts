@@ -7,7 +7,11 @@ import {
   CompletedExerciseHistoryDetail,
   PersonalGoalsPreferences,
 } from '../types/workoutSession';
-import { WORKOUT_PLANS_DATA, WorkoutPlan } from '../data/workoutLibraryData';
+import {
+  WORKOUT_PLANS_DATA,
+  WorkoutPlan,
+  getTodaysScheduledPlan,
+} from '../data/workoutLibraryData';
 import { EXERCISE_LIBRARY_DATA } from '../data/exerciseLibraryData';
 import { ExerciseId } from '../design-system/components/ExerciseVisuals';
 
@@ -18,8 +22,8 @@ export const STORAGE_KEYS = {
 };
 
 export const DEFAULT_PERSONAL_GOALS: PersonalGoalsPreferences = {
-  weeklyWorkoutDaysGoal: 5,
-  weeklyWorkoutMinutesGoal: 150,
+  weeklyWorkoutDaysGoal: 6,
+  weeklyWorkoutMinutesGoal: 170,
   dailyReminderEnabled: true,
   dailyReminderTime: '07:30',
   preferredWeightUnit: 'KG',
@@ -144,7 +148,8 @@ export function createWorkoutSessionFromPlan(
   }
 
   const plan: WorkoutPlan =
-    WORKOUT_PLANS_DATA.find((p) => p.id === planId) || WORKOUT_PLANS_DATA[0];
+    WORKOUT_PLANS_DATA.find((p) => p.id === planId) ||
+    getTodaysScheduledPlan().workoutPlan;
 
   const exercises: ExerciseSession[] = plan.exercises.map((step, exIdx) => {
     const libEntry = findExerciseLibraryEntry(step.exerciseId, step.name);

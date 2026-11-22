@@ -26,13 +26,17 @@ import {
   ExerciseCategoryCard,
 } from '../design-system/components/Cards';
 import {
-  TODAYS_WORKOUT_SAMPLE,
   WEEKLY_ACTIVITY_SAMPLE,
   QUICK_STATS_SAMPLE,
   EXERCISE_CATEGORIES_SAMPLE,
   RECENT_ACTIVITY_SAMPLE,
   MuscleCategorySlug,
 } from '../data/dashboardSampleData';
+import {
+  REPEATING_WEEKLY_SCHEDULE,
+  WORKOUT_PLANS_DATA,
+  getTodaysScheduledPlan,
+} from '../data/workoutLibraryData';
 import {
   loadActiveWorkoutSession,
   loadCompletedWorkoutHistory,
@@ -79,10 +83,24 @@ export const HomeDashboard: React.FC = () => {
   const realStats = hasRealHistory
     ? calculateOverallProgressStatistics(savedHistory)
     : null;
-  const realWeekly = hasRealHistory
-    ? calculateWeeklyActivity(savedHistory, 0)
-    : null;
+  const currentWeekActivity = calculateWeeklyActivity(savedHistory, 0);
+  const realWeekly = hasRealHistory ? currentWeekActivity : null;
   const userGoals = loadPersonalGoals();
+
+  // Resolve Today's Scheduled Workout from the Repeating 7-Day Weekly Plan
+  const { daySchedule: todaysDaySchedule, workoutPlan: todaysScheduledPlan } =
+    getTodaysScheduledPlan();
+
+  const isTodayCompleted = Boolean(
+    currentWeekActivity.days.find((d) => d.isToday && d.workoutsCount > 0)
+  );
+  const todaysCompletionPercent = isTodayCompleted
+    ? 100
+    : hasActiveUnfinishedSession &&
+      savedSession?.planId === todaysScheduledPlan.id &&
+      savedProgress
+    ? savedProgress.completionPercentage
+    : 0;
 
   const displayedCompletedDays = realWeekly
     ? realWeekly.activeDaysInWeek
@@ -137,7 +155,7 @@ export const HomeDashboard: React.FC = () => {
           ===================================================================== */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
         {/* -------------------------------------------------------------------
-            SECTION 2: TODAY'S WORKOUT CARD (Prominent Featured Hero Card)
+            SECTION 2: TODAY'S WORKOUT CARD (Automatically Loads Today's Day from Repeating Weekly Plan)
             ------------------------------------------------------------------- */}
         <div className="lg:col-span-7 bg-white rounded-[12px] border-2 border-[#E53935] p-5 sm:p-6 shadow-hf-sm flex flex-col justify-between">
           <div>
@@ -146,50 +164,53 @@ export const HomeDashboard: React.FC = () => {
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#FEF2F2] border border-[#FECACA] text-[#E53935] font-mono tabular-nums text-[12px] font-bold">
                   <Clock className="w-3.5 h-3.5" strokeWidth={2.25} />
-                  {TODAYS_WORKOUT_SAMPLE.durationMinutes} Minutes
+                  {todaysScheduledPlan.durationMinutes} Minutes
                 </span>
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-[#F8FAFC] border border-[#E5E7EB] text-[#111827] text-[12px] font-bold">
                   <Dumbbell className="w-3.5 h-3.5 text-[#E53935]" strokeWidth={2.25} />
-                  {TODAYS_WORKOUT_SAMPLE.workoutType}
+                  {todaysScheduledPlan.primaryCategory}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] bg-[#F8FAFC] border border-[#E5E7EB] font-mono tabular-nums text-[#4B5563] text-[12px] font-bold">
-                  {TODAYS_WORKOUT_SAMPLE.exerciseCount} Exercises
+                  {todaysScheduledPlan.exercises.length} Exercises
                 </span>
               </div>
 
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#E53935] text-white text-[11px] font-bold uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                Today’s Session
+                {todaysDaySchedule.dayName} •{' '}
+                {todaysDaySchedule.isRestDay ? 'Recovery Day' : 'Day ' + todaysDaySchedule.dayIndex + ' of 6'}
               </span>
             </div>
 
             {/* Workout Title & Subtitle */}
+            <span className="text-[11px] font-bold uppercase tracking-wider text-[#E53935] block mb-0.5">
+              Today’s Scheduled Plan: {todaysDaySchedule.focusTitle}
+            </span>
             <h1 className="text-[24px] sm:text-[28px] font-extrabold text-[#111827] tracking-tight leading-tight">
-              {TODAYS_WORKOUT_SAMPLE.title}
+              {todaysScheduledPlan.name}
             </h1>
             <p className="text-[14px] font-medium text-[#4B5563] mt-1.5">
-              Structured 30-minute full-body strength circuit using Barbell, Dumbbells, Push-Ups, and Core floor exercises.
+              {todaysScheduledPlan.subtitle}
             </p>
 
-            {/* Compact 6-Exercise Circuit Preview Pills */}
+            {/* Compact Circuit Preview Pills */}
             <div className="mt-4 pt-4 border-t border-[#F1F5F9]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[11px] font-bold uppercase tracking-[0.04em] text-[#6B7280]">
-                  Circuit Lineup ({TODAYS_WORKOUT_SAMPLE.exerciseCount} Exercises)
+                  Circuit Lineup ({todaysScheduledPlan.exercises.length} Exercises)
                 </span>
                 <span className="font-mono tabular-nums text-[11px] font-semibold text-[#6B7280]">
-                  Est. {TODAYS_WORKOUT_SAMPLE.estimatedCalories} kcal
+                  Est. {todaysScheduledPlan.estimatedCalories} kcal
                 </span>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {TODAYS_WORKOUT_SAMPLE.exercisesPreview.map((ex, index) => {
-                  const isDone = index < TODAYS_WORKOUT_SAMPLE.completedExercises;
+                {todaysScheduledPlan.exercises.map((ex, index) => {
                   return (
                     <div
-                      key={ex.id}
+                      key={`${ex.exerciseId}-${index}`}
                       className={`px-2.5 py-2 rounded-[8px] border text-left flex items-center justify-between gap-1.5 ${
-                        isDone
+                        isTodayCompleted
                           ? 'bg-[#F0FDF4] border-[#BBF7D0]'
                           : 'bg-[#F8FAFC] border-[#E5E7EB]'
                       }`}
@@ -199,10 +220,10 @@ export const HomeDashboard: React.FC = () => {
                           {index + 1}. {ex.name}
                         </span>
                         <span className="block font-mono tabular-nums text-[11px] font-semibold text-[#6B7280]">
-                          {ex.setsReps}
+                          {ex.sets} × {ex.repsOrDuration}
                         </span>
                       </div>
-                      {isDone && (
+                      {isTodayCompleted && (
                         <CheckCircle2
                           className="w-3.5 h-3.5 text-[#16A34A] shrink-0"
                           strokeWidth={2.5}
@@ -220,18 +241,18 @@ export const HomeDashboard: React.FC = () => {
             <div>
               <div className="flex items-center justify-between text-[12px] font-bold mb-1.5">
                 <span className="text-[#4B5563]">
-                  Workout Progress ({TODAYS_WORKOUT_SAMPLE.completedExercises} of{' '}
-                  {TODAYS_WORKOUT_SAMPLE.exerciseCount} exercises ready)
+                  {isTodayCompleted
+                    ? `Completed Today (${todaysDaySchedule.dayName})`
+                    : `${todaysDaySchedule.dayName} Schedule Status`}
                 </span>
                 <span className="font-mono tabular-nums text-[#E53935]">
-                  {TODAYS_WORKOUT_SAMPLE.completionPercent}%
+                  {todaysCompletionPercent}%
                 </span>
               </div>
-              {/* Segmented + Linear Progress Indicator */}
               <div className="w-full h-2.5 bg-[#F1F5F9] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#E53935] rounded-full transition-all duration-300"
-                  style={{ width: `${TODAYS_WORKOUT_SAMPLE.completionPercent}%` }}
+                  style={{ width: `${todaysCompletionPercent}%` }}
                 />
               </div>
             </div>
@@ -241,15 +262,21 @@ export const HomeDashboard: React.FC = () => {
                 variant="primary"
                 size="lg"
                 fullWidth
-                onClick={() => navigate('/workout/active')}
+                onClick={() =>
+                  navigate(`/workout/active?plan=${todaysScheduledPlan.id}`)
+                }
                 leftIcon={<Play className="w-5 h-5 fill-current" />}
               >
-                Start Workout
+                {todaysDaySchedule.isRestDay
+                  ? 'Start Optional 15m Stretch'
+                  : `Start ${todaysDaySchedule.dayName} Workout`}
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                onClick={() => navigate('/workouts/full-body-workout-a')}
+                onClick={() =>
+                  navigate(`/workouts/${todaysScheduledPlan.id}`)
+                }
                 className="shrink-0"
               >
                 View Details
@@ -476,6 +503,119 @@ export const HomeDashboard: React.FC = () => {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* =====================================================================
+          REPEATING 7-DAY WEEKLY WORKOUT PLAN (Repeats Every Week)
+          6 Workout Days (Monday – Saturday) + 1 Recovery/Rest Day (Sunday)
+          ===================================================================== */}
+      <section className="bg-white rounded-[12px] border border-[#E5E7EB] p-5 sm:p-6 shadow-hf-xs space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-[#F1F5F9]">
+          <div>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.05em] text-[#E53935]">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>Repeating Weekly Training Split • Repeats Every Week</span>
+            </div>
+            <h2 className="text-[19px] sm:text-[22px] font-extrabold text-[#111827] tracking-tight mt-0.5">
+              Your 7-Day Weekly Workout Plan (Mon – Sun)
+            </h2>
+            <p className="text-[13px] font-medium text-[#4B5563]">
+              6 structured workout days (Monday–Saturday) + 1 rest & recovery day (Sunday). Tap any day to start or preview that day’s workout.
+            </p>
+          </div>
+          <span className="px-3 py-1 rounded-[6px] bg-[#FEF2F2] border border-[#FECACA] font-mono text-[12px] font-bold text-[#E53935]">
+            6 Days On • 1 Day Rest
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3">
+          {REPEATING_WEEKLY_SCHEDULE.map((dayItem, idx) => {
+            const assignedPlan =
+              WORKOUT_PLANS_DATA.find((p) => p.id === dayItem.planId) ||
+              WORKOUT_PLANS_DATA[0];
+            const isTodayDay = dayItem.jsDayOfWeek === new Date().getDay();
+            const dayBucketInCurrentWeek = currentWeekActivity.days[idx];
+            const isDoneThisWeek = Boolean(
+              dayBucketInCurrentWeek && dayBucketInCurrentWeek.workoutsCount > 0
+            );
+
+            return (
+              <div
+                key={dayItem.dayShort}
+                onClick={() =>
+                  navigate(`/workout/active?plan=${assignedPlan.id}`)
+                }
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) =>
+                  e.key === 'Enter' &&
+                  navigate(`/workout/active?plan=${assignedPlan.id}`)
+                }
+                className={`p-3.5 rounded-[10px] border transition-all flex flex-col justify-between cursor-pointer group ${
+                  isTodayDay
+                    ? 'bg-[#FEF2F2] border-2 border-[#E53935] shadow-hf-xs'
+                    : dayItem.isRestDay
+                    ? 'bg-[#F8FAFC] border-[#E5E7EB] hover:border-[#D1D5DB]'
+                    : 'bg-white border-[#E5E7EB] hover:border-[#E53935]'
+                }`}
+              >
+                <div>
+                  {/* Day Name + Today / Completed Badge */}
+                  <div className="flex items-center justify-between gap-1 mb-2">
+                    <span
+                      className={`font-mono text-[11px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-[4px] ${
+                        isTodayDay
+                          ? 'bg-[#E53935] text-white'
+                          : dayItem.isRestDay
+                          ? 'bg-[#E5E7EB] text-[#4B5563]'
+                          : 'bg-[#F8FAFC] text-[#111827] border border-[#E5E7EB]'
+                      }`}
+                    >
+                      {dayItem.dayShort}
+                    </span>
+
+                    {isDoneThisWeek ? (
+                      <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-[#16A34A]">
+                        <CheckCircle2 className="w-3.5 h-3.5" strokeWidth={2.5} />
+                        Done
+                      </span>
+                    ) : isTodayDay ? (
+                      <span className="text-[10px] font-extrabold uppercase text-[#E53935]">
+                        Today
+                      </span>
+                    ) : (
+                      <span className="font-mono text-[10px] font-bold text-[#6B7280]">
+                        {assignedPlan.durationMinutes}m
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Focus Title & Plan Name */}
+                  <span className="block text-[10px] font-bold uppercase tracking-wider text-[#E53935] truncate">
+                    {dayItem.isRestDay ? 'Rest & Mobility' : assignedPlan.primaryCategory}
+                  </span>
+                  <h3 className="text-[14px] font-extrabold text-[#111827] group-hover:text-[#E53935] transition-colors leading-snug mt-0.5">
+                    {dayItem.isRestDay ? 'Sunday Rest / Stretch' : assignedPlan.name}
+                  </h3>
+                  <p className="text-[11px] font-medium text-[#4B5563] mt-1 line-clamp-2 leading-snug">
+                    {dayItem.focusTitle}
+                  </p>
+                </div>
+
+                {/* Bottom Action */}
+                <div className="mt-3 pt-2 border-t border-[#F1F5F9] flex items-center justify-between text-[11px] font-bold">
+                  <span className="font-mono text-[#6B7280]">
+                    {assignedPlan.exercises.length} moves
+                  </span>
+                  <span className="text-[#E53935] inline-flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                    {isTodayDay ? 'Train Now' : 'Open'}
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </section>
 
