@@ -1,111 +1,5 @@
 import { ExerciseId } from '../design-system/components/ExerciseVisuals';
 
-export interface TodaysWorkoutData {
-  id: string;
-  title: string;
-  durationMinutes: number;
-  workoutType: string;
-  exerciseCount: number;
-  completionPercent: number;
-  completedExercises: number;
-  equipment: string[];
-  estimatedCalories: number;
-  exercisesPreview: {
-    id: ExerciseId;
-    name: string;
-    setsReps: string;
-    load: string;
-  }[];
-}
-
-export const TODAYS_WORKOUT_SAMPLE: TodaysWorkoutData = {
-  id: 'full-body-strength-30',
-  title: "Today's Full Body Workout",
-  durationMinutes: 30,
-  workoutType: 'Strength',
-  exerciseCount: 6,
-  completionPercent: 33,
-  completedExercises: 2,
-  equipment: ['Barbell', 'Dumbbells', 'Push-Ups', 'Core Floor'],
-  estimatedCalories: 325,
-  exercisesPreview: [
-    { id: 'barbell-squat', name: 'Barbell Squat', setsReps: '4 × 10', load: '60 KG' },
-    { id: 'push-ups', name: 'Push-Ups', setsReps: '3 × 15', load: 'Bodyweight' },
-    { id: 'barbell-row', name: 'Barbell Row', setsReps: '4 × 10', load: '45 KG' },
-    { id: 'dumbbell-shoulder-press', name: 'Dumbbell Shoulder Press', setsReps: '3 × 10', load: '16 KG' },
-    { id: 'lunges', name: 'Lunges', setsReps: '3 × 12', load: 'Bodyweight' },
-    { id: 'plank', name: 'Plank', setsReps: '3 × 60s', load: 'Core Hold' },
-  ],
-};
-
-export interface WeeklyDayStatus {
-  dayShort: string;
-  dayFull: string;
-  dateNumber: number;
-  status: 'completed' | 'today' | 'rest' | 'upcoming';
-  minutesCompleted: number;
-}
-
-export interface WeeklyActivitySummary {
-  completedDays: number;
-  targetDays: number;
-  totalMinutesCompleted: number;
-  targetMinutes: number;
-  days: WeeklyDayStatus[];
-}
-
-export const WEEKLY_ACTIVITY_SAMPLE: WeeklyActivitySummary = {
-  completedDays: 4,
-  targetDays: 6,
-  totalMinutesCompleted: 110,
-  targetMinutes: 170,
-  days: [
-    { dayShort: 'MON', dayFull: 'Monday', dateNumber: 16, status: 'completed', minutesCompleted: 30 },
-    { dayShort: 'TUE', dayFull: 'Tuesday', dateNumber: 17, status: 'completed', minutesCompleted: 30 },
-    { dayShort: 'WED', dayFull: 'Wednesday', dateNumber: 18, status: 'completed', minutesCompleted: 30 },
-    { dayShort: 'THU', dayFull: 'Thursday', dateNumber: 19, status: 'completed', minutesCompleted: 20 },
-    { dayShort: 'FRI', dayFull: 'Friday', dateNumber: 20, status: 'upcoming', minutesCompleted: 0 },
-    { dayShort: 'SAT', dayFull: 'Saturday', dateNumber: 21, status: 'upcoming', minutesCompleted: 0 },
-    { dayShort: 'SUN', dayFull: 'Sunday', dateNumber: 22, status: 'today', minutesCompleted: 15 },
-  ],
-};
-
-export interface QuickStatItem {
-  id: string;
-  label: string;
-  value: string;
-  unit: string;
-  trend: string;
-  accentRed?: boolean;
-}
-
-export const QUICK_STATS_SAMPLE: QuickStatItem[] = [
-  {
-    id: 'workouts-completed',
-    label: 'Workouts Completed',
-    value: '24',
-    unit: 'Sessions',
-    trend: '+3 this week (Demo)',
-    accentRed: true,
-  },
-  {
-    id: 'total-minutes',
-    label: 'Total Workout Minutes',
-    value: '720',
-    unit: 'Mins',
-    trend: '24 × 30m logged (Demo)',
-    accentRed: false,
-  },
-  {
-    id: 'current-streak',
-    label: 'Current Workout Streak',
-    value: '5',
-    unit: 'Days',
-    trend: 'Personal Best: 12d (Demo)',
-    accentRed: true,
-  },
-];
-
 export type MuscleCategorySlug =
   | 'chest'
   | 'back'
@@ -132,16 +26,26 @@ export const EXERCISE_CATEGORIES_SAMPLE: MuscleCategoryItem[] = [
     exerciseCount: 4,
     durationRange: '10–15 Min Block',
     equipmentSummary: 'Bodyweight & Dumbbells',
-    featuredExercises: ['push-ups'],
+    featuredExercises: [
+      'push-ups',
+      'dumbbell-floor-press',
+      'wide-push-ups',
+      'dumbbell-squeeze-press',
+    ],
   },
   {
     slug: 'back',
     name: 'Back',
     subtitle: 'Barbell Deadlifts, Barbell Rows & Unilateral Dumbbell Rows',
-    exerciseCount: 5,
+    exerciseCount: 4,
     durationRange: '12–18 Min Block',
     equipmentSummary: 'Barbell & Dumbbells',
-    featuredExercises: ['barbell-deadlift', 'barbell-row', 'dumbbell-row'],
+    featuredExercises: [
+      'barbell-rows',
+      'one-arm-dumbbell-rows',
+      'dumbbell-reverse-fly',
+      'barbell-deadlift',
+    ],
   },
   {
     slug: 'shoulders',
@@ -149,78 +53,54 @@ export const EXERCISE_CATEGORIES_SAMPLE: MuscleCategoryItem[] = [
     subtitle: 'Overhead Dumbbell Presses & Lateral Deltoid Raises',
     exerciseCount: 4,
     durationRange: '10–12 Min Block',
-    equipmentSummary: 'Dumbbells',
-    featuredExercises: ['dumbbell-shoulder-press', 'dumbbell-lateral-raise'],
+    equipmentSummary: 'Dumbbells & Barbell',
+    featuredExercises: [
+      'dumbbell-shoulder-press',
+      'dumbbell-lateral-raises',
+      'dumbbell-front-raises',
+      'barbell-overhead-press',
+    ],
   },
   {
     slug: 'arms',
     name: 'Arms',
-    subtitle: 'Dumbbell Bicep Curls, Forearm & Tricep Push Lockouts',
+    subtitle: 'Dumbbell Bicep Curls, Barbell Curls & Tricep Push Lockouts',
     exerciseCount: 4,
     durationRange: '8–12 Min Block',
     equipmentSummary: 'Dumbbells & Barbell',
-    featuredExercises: ['dumbbell-bicep-curl', 'push-ups'],
+    featuredExercises: [
+      'dumbbell-bicep-curls',
+      'barbell-curls',
+      'close-grip-push-ups',
+      'overhead-triceps-extension',
+    ],
   },
   {
     slug: 'legs',
     name: 'Legs',
-    subtitle: 'Barbell Back Squats, Deadlifts & Dynamic Forward Lunges',
-    exerciseCount: 6,
+    subtitle: 'Barbell Back Squats, Romanian Deadlifts & Forward Lunges',
+    exerciseCount: 4,
     durationRange: '15–20 Min Block',
     equipmentSummary: 'Barbell, Dumbbells & Bodyweight',
-    featuredExercises: ['barbell-squat', 'barbell-deadlift', 'lunges'],
+    featuredExercises: [
+      'barbell-squats',
+      'dumbbell-lunges',
+      'dumbbell-romanian-deadlift',
+      'calf-raises',
+    ],
   },
   {
     slug: 'core',
     name: 'Core',
     subtitle: 'Isometric Plank Holds, Supine Leg Raises & Mountain Climbers',
-    exerciseCount: 5,
+    exerciseCount: 4,
     durationRange: '8–10 Min Block',
     equipmentSummary: 'Core & Floor Mat',
-    featuredExercises: ['plank', 'leg-raises', 'mountain-climbers'],
-  },
-];
-
-export interface RecentWorkoutItem {
-  id: string;
-  workoutName: string;
-  focusTag: string;
-  dateLabel: string;
-  duration: string;
-  setsCompleted: string;
-  calories: number;
-  status: 'Completed';
-}
-
-export const RECENT_ACTIVITY_SAMPLE: RecentWorkoutItem[] = [
-  {
-    id: 'rec-1',
-    workoutName: 'Full-Body Barbell & Core Circuit',
-    focusTag: 'Strength • Barbell & Floor',
-    dateLabel: 'Thursday, Nov 19',
-    duration: '30 min',
-    setsCompleted: '18 / 18 Sets',
-    calories: 342,
-    status: 'Completed',
-  },
-  {
-    id: 'rec-2',
-    workoutName: 'Upper Body Dumbbell & Push-Up Power',
-    focusTag: 'Hypertrophy • Dumbbells & Bodyweight',
-    dateLabel: 'Tuesday, Nov 17',
-    duration: '30 min',
-    setsCompleted: '16 / 16 Sets',
-    calories: 310,
-    status: 'Completed',
-  },
-  {
-    id: 'rec-3',
-    workoutName: 'Lower Body Squat, Lunge & Plank Blast',
-    focusTag: 'Strength • Legs & Core',
-    dateLabel: 'Monday, Nov 16',
-    duration: '30 min',
-    setsCompleted: '18 / 18 Sets',
-    calories: 355,
-    status: 'Completed',
+    featuredExercises: [
+      'plank',
+      'leg-raises',
+      'bicycle-crunches',
+      'mountain-climbers',
+    ],
   },
 ];

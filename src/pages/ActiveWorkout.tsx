@@ -1389,7 +1389,7 @@ export const ActiveWorkout: React.FC = () => {
           ===================================================================== */}
       <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left 6 Cols: Current Exercise Visual, Format Header & Instructions */}
-        <div className="lg:col-span-6 bg-white rounded-[12px] border border-[#E5E7EB] overflow-hidden shadow-hf-xs">
+        <div className="lg:col-span-6 bg-white rounded-[12px] border border-[#E5E7EB] overflow-hidden shadow-hf-xs order-2 lg:order-1">
           {/* Required Header Format:
               Exercise 1 of 6
               Barbell Squats
@@ -1466,9 +1466,28 @@ export const ActiveWorkout: React.FC = () => {
         </div>
 
         {/* Right 6 Cols: Set Tracking, Repetition Editor, Complete Set & Exercise Navigation */}
-        <div className="lg:col-span-6 space-y-5">
+        <div className="lg:col-span-6 space-y-5 order-1 lg:order-2">
           {/* Active Set Repetition Editor + Complete Set CTA Card */}
           <div className="bg-white rounded-[12px] border-2 border-[#E53935] p-5 sm:p-6 shadow-hf-sm space-y-5">
+            {/* Compact Mobile-First Exercise Summary Header */}
+            <div className="lg:hidden pb-4 border-b border-[#F1F5F9] flex items-center gap-3.5">
+              <div className="w-20 h-16 rounded-[8px] border border-[#E5E7EB] bg-[#F8FAFC] overflow-hidden shrink-0">
+                <ExerciseIllustration id={currentExercise.exerciseId} />
+              </div>
+              <div className="min-w-0">
+                <span className="font-mono text-[11px] font-extrabold uppercase text-[#E53935] block">
+                  Exercise {session.currentExerciseIndex + 1} of{' '}
+                  {session.exercises.length} • {currentExercise.equipment}
+                </span>
+                <h2 className="text-[20px] font-extrabold text-[#111827] leading-tight truncate">
+                  {currentExercise.name}
+                </h2>
+                <span className="text-[12px] font-semibold text-[#4B5563] block truncate">
+                  Target: {currentExercise.targetMuscle}
+                </span>
+              </div>
+            </div>
+
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#E53935] block">

@@ -188,12 +188,12 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
             </div>
 
             {/* Right: Online/Offline Status + Install App / Guide + Current Date + Profile Icon */}
-            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-              {/* Quick Weekly Plan Button in Top Header */}
+            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+              {/* Quick Weekly Plan Button in Top Header (Hidden on tiny screens where Bottom Nav has it) */}
               <button
                 type="button"
                 onClick={() => navigate('/weekly-plan')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] border text-[12px] font-bold transition-all ${
+                className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] border text-[12px] font-bold transition-all ${
                   activeTab === 'weekly-plan'
                     ? 'bg-[#E53935] text-white border-[#E53935] shadow-hf-red'
                     : 'bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#E53935] border-[#FECACA]'
@@ -208,10 +208,11 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                 type="button"
                 onClick={() => setShowGlobalResetModal(true)}
                 title="Reset Workout Progress, History & Cache"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[8px] bg-white hover:bg-[#FEF2F2] border border-[#E5E7EB] hover:border-[#FECACA] text-[12px] font-bold text-[#4B5563] hover:text-[#E53935] transition-colors"
+                aria-label="Reset Workout Data"
+                className="inline-flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 rounded-[8px] bg-white hover:bg-[#FEF2F2] border border-[#E5E7EB] hover:border-[#FECACA] text-[12px] font-bold text-[#4B5563] hover:text-[#E53935] transition-colors"
               >
                 <RotateCcw className="w-3.5 h-3.5 text-[#E53935]" strokeWidth={2.25} />
-                <span>Reset</span>
+                <span className="hidden xs:inline sm:inline">Reset</span>
               </button>
 
               {/* Small Connection Status Indicator (Online / Offline) */}
@@ -221,7 +222,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
               <HeaderInstallAction />
 
               {/* Current Date */}
-              <div className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[8px] bg-[#F8FAFC] border border-[#E5E7EB] text-[#4B5563] text-[12px] font-semibold">
+              <div className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[8px] bg-[#F8FAFC] border border-[#E5E7EB] text-[#4B5563] text-[12px] font-semibold">
                 <Calendar className="w-3.5 h-3.5 text-[#E53935] shrink-0" strokeWidth={2.25} />
                 <span className="tabular-nums">{formattedCurrentDate}</span>
               </div>
@@ -231,13 +232,13 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                 onClick={() => navigate('/profile')}
                 aria-label="Open Athlete Profile"
                 title="Athlete Profile"
-                className={`w-10 h-10 rounded-[10px] border flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E53935] focus-visible:ring-offset-2 ${
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-[10px] border flex items-center justify-center transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E53935] focus-visible:ring-offset-2 ${
                   activeTab === 'profile'
                     ? 'bg-[#E53935] text-white border-[#E53935] shadow-hf-red'
                     : 'bg-white hover:bg-[#FEF2F2] text-[#111827] hover:text-[#E53935] border-[#E5E7EB] hover:border-[#FECACA]'
                 }`}
               >
-                <User className="w-5 h-5" strokeWidth={2.25} />
+                <User className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.25} />
               </button>
             </div>
           </div>

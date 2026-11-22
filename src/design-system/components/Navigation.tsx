@@ -51,7 +51,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <nav
       aria-label="Mobile Bottom Navigation"
-      className="w-full bg-white border-t border-[#E5E7EB] px-2 h-16 flex items-center justify-around select-none"
+      className="w-full bg-white border-t border-[#E5E7EB] px-1 h-16 pb-safe flex items-center justify-around select-none"
     >
       {items.map((item) => {
         const Icon = item.icon;
@@ -62,7 +62,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             type="button"
             aria-current={isActive ? 'page' : undefined}
             onClick={() => onSelect(item.id)}
-            className={`relative flex flex-col items-center justify-center py-1.5 px-3 rounded-[8px] transition-colors min-w-[60px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E53935] ${
+            className={`relative flex-1 flex flex-col items-center justify-center py-1.5 px-1 rounded-[8px] transition-colors min-w-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E53935] ${
               isActive
                 ? 'text-[#E53935]'
                 : 'text-[#6B7280] hover:text-[#111827] hover:bg-[#F8FAFC]'
@@ -70,20 +70,20 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
           >
             {/* Top active indicator pill */}
             {isActive && (
-              <span className="absolute -top-[9px] w-7 h-[3px] bg-[#E53935] rounded-b-full" />
+              <span className="absolute -top-[7px] w-6 h-[3px] bg-[#E53935] rounded-b-full" />
             )}
             <div
-              className={`relative flex items-center justify-center w-9 h-7 rounded-[6px] transition-colors ${
+              className={`relative flex items-center justify-center w-8 h-6 rounded-[6px] transition-colors ${
                 isActive ? 'bg-[#FEF2F2]' : 'bg-transparent'
               }`}
             >
               <Icon
-                className="w-5 h-5"
+                className="w-[18px] h-[18px]"
                 strokeWidth={isActive ? 2.25 : 1.75}
               />
               {item.badge && (
                 <span
-                  className={`absolute -top-1 -right-2 px-1 py-0.2 text-[9px] font-bold uppercase rounded-[4px] leading-tight ${
+                  className={`hidden sm:inline-block absolute -top-1 -right-2.5 px-1 py-0.2 text-[8px] font-bold uppercase rounded-[3px] leading-tight ${
                     isActive
                       ? 'bg-[#E53935] text-white'
                       : 'bg-[#F1F5F9] text-[#4B5563]'
@@ -94,7 +94,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
               )}
             </div>
             <span
-              className={`mt-0.5 text-[11px] leading-tight tracking-tight ${
+              className={`mt-0.5 text-[10px] sm:text-[11px] leading-tight tracking-tight truncate max-w-full ${
                 isActive ? 'font-bold text-[#E53935]' : 'font-medium text-[#6B7280]'
               }`}
             >
