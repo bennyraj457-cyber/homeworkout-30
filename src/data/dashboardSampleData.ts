@@ -55,18 +55,18 @@ export interface WeeklyActivitySummary {
 }
 
 export const WEEKLY_ACTIVITY_SAMPLE: WeeklyActivitySummary = {
-  completedDays: 3,
-  targetDays: 5,
-  totalMinutesCompleted: 90,
-  targetMinutes: 150,
+  completedDays: 4,
+  targetDays: 6,
+  totalMinutesCompleted: 110,
+  targetMinutes: 170,
   days: [
     { dayShort: 'MON', dayFull: 'Monday', dateNumber: 16, status: 'completed', minutesCompleted: 30 },
     { dayShort: 'TUE', dayFull: 'Tuesday', dateNumber: 17, status: 'completed', minutesCompleted: 30 },
-    { dayShort: 'WED', dayFull: 'Wednesday', dateNumber: 18, status: 'rest', minutesCompleted: 0 },
-    { dayShort: 'THU', dayFull: 'Thursday', dateNumber: 19, status: 'completed', minutesCompleted: 30 },
-    { dayShort: 'FRI', dayFull: 'Friday', dateNumber: 20, status: 'rest', minutesCompleted: 0 },
+    { dayShort: 'WED', dayFull: 'Wednesday', dateNumber: 18, status: 'completed', minutesCompleted: 30 },
+    { dayShort: 'THU', dayFull: 'Thursday', dateNumber: 19, status: 'completed', minutesCompleted: 20 },
+    { dayShort: 'FRI', dayFull: 'Friday', dateNumber: 20, status: 'upcoming', minutesCompleted: 0 },
     { dayShort: 'SAT', dayFull: 'Saturday', dateNumber: 21, status: 'upcoming', minutesCompleted: 0 },
-    { dayShort: 'SUN', dayFull: 'Sunday', dateNumber: 22, status: 'today', minutesCompleted: 10 },
+    { dayShort: 'SUN', dayFull: 'Sunday', dateNumber: 22, status: 'today', minutesCompleted: 15 },
   ],
 };
 

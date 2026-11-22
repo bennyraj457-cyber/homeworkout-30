@@ -54,8 +54,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,woff2}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
-        // Do NOT force skipWaiting automatically so active workouts are never interrupted
-        skipWaiting: false,
+        skipWaiting: true,
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
@@ -106,7 +105,7 @@ export default defineConfig({
         ],
       },
       devOptions: {
-        enabled: true,
+        enabled: false,
         type: 'module',
       },
     }),

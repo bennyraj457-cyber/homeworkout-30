@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Clock,
@@ -71,6 +71,10 @@ export const HomeDashboard: React.FC = () => {
     setShowManualInstructionsModal,
   } = usePwa();
 
+  // Allow user to click any day (MON–SUN) in the repeating weekly plan to preview/start that day right from the top hero card
+  const todayJsDay = new Date().getDay();
+  const [selectedJsDay, setSelectedJsDay] = useState<number>(todayJsDay);
+
   const savedSession = loadActiveWorkoutSession();
   const hasActiveUnfinishedSession =
     savedSession && savedSession.stage === 'active';
@@ -87,20 +91,30 @@ export const HomeDashboard: React.FC = () => {
   const realWeekly = hasRealHistory ? currentWeekActivity : null;
   const userGoals = loadPersonalGoals();
 
-  // Resolve Today's Scheduled Workout from the Repeating 7-Day Weekly Plan
-  const { daySchedule: todaysDaySchedule, workoutPlan: todaysScheduledPlan } =
-    getTodaysScheduledPlan();
+  // Resolve Selected Day's Scheduled Workout from the Repeating 7-Day Weekly Plan (defaults to Today)
+  const selectedDaySchedule =
+    REPEATING_WEEKLY_SCHEDULE.find((d) => d.jsDayOfWeek === selectedJsDay) ||
+    getTodaysScheduledPlan().daySchedule;
+  const selectedDayPlan =
+    WORKOUT_PLANS_DATA.find((p) => p.id === selectedDaySchedule.planId) ||
+    getTodaysScheduledPlan().workoutPlan;
 
+  const isSelectedDayToday = selectedJsDay === todayJsDay;
+
+  const selectedDayBucket =
+    currentWeekActivity.days[selectedDaySchedule.dayIndex - 1];
   const isTodayCompleted = Boolean(
-    currentWeekActivity.days.find((d) => d.isToday && d.workoutsCount > 0)
+    selectedDayBucket && selectedDayBucket.workoutsCount > 0
   );
   const todaysCompletionPercent = isTodayCompleted
     ? 100
     : hasActiveUnfinishedSession &&
-      savedSession?.planId === todaysScheduledPlan.id &&
+      savedSession?.planId === selectedDayPlan.id &&
       savedProgress
     ? savedProgress.completionPercentage
     : 0;
+  const todaysDaySchedule = selectedDaySchedule;
+  const todaysScheduledPlan = selectedDayPlan;
 
   const displayedCompletedDays = realWeekly
     ? realWeekly.activeDaysInWeek
@@ -159,6 +173,43 @@ export const HomeDashboard: React.FC = () => {
             ------------------------------------------------------------------- */}
         <div className="lg:col-span-7 bg-white rounded-[12px] border-2 border-[#E53935] p-5 sm:p-6 shadow-hf-sm flex flex-col justify-between">
           <div>
+            {/* Repeating Weekly Day Switcher Bar (MON - SUN) right at top of hero card */}
+            <div className="mb-4 pb-3 border-b border-[#F1F5F9]">
+              <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-[#6B7280] mb-2">
+                <span>Repeating Weekly Plan (Tap any day)</span>
+                <span className="text-[#E53935]">Repeats Every Week</span>
+              </div>
+              <div className="grid grid-cols-7 gap-1.5">
+                {REPEATING_WEEKLY_SCHEDULE.map((d) => {
+                  const isActiveDay = d.jsDayOfWeek === selectedJsDay;
+                  const isRealToday = d.jsDayOfWeek === todayJsDay;
+                  return (
+                    <button
+                      key={d.dayShort}
+                      type="button"
+                      onClick={() => setSelectedJsDay(d.jsDayOfWeek)}
+                      className={`py-1.5 px-1 rounded-[7px] font-mono text-[11px] font-extrabold uppercase border transition-all flex flex-col items-center ${
+                        isActiveDay
+                          ? 'bg-[#E53935] text-white border-[#E53935] shadow-hf-xs'
+                          : isRealToday
+                          ? 'bg-[#FEF2F2] text-[#E53935] border-[#FECACA]'
+                          : 'bg-[#F8FAFC] text-[#4B5563] border-[#E5E7EB] hover:border-[#E53935]'
+                      }`}
+                    >
+                      <span>{d.dayShort}</span>
+                      <span
+                        className={`text-[9px] font-sans font-bold truncate max-w-full ${
+                          isActiveDay ? 'text-white/90' : 'text-[#6B7280]'
+                        }`}
+                      >
+                        {d.isRestDay ? 'Rest' : `Day ${d.dayIndex}`}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Top Status & Badges */}
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -177,7 +228,8 @@ export const HomeDashboard: React.FC = () => {
 
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#E53935] text-white text-[11px] font-bold uppercase tracking-wider">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                {todaysDaySchedule.dayName} •{' '}
+                {todaysDaySchedule.dayName}
+                {isSelectedDayToday ? ' (Today)' : ''} •{' '}
                 {todaysDaySchedule.isRestDay ? 'Recovery Day' : 'Day ' + todaysDaySchedule.dayIndex + ' of 6'}
               </span>
             </div>
@@ -356,134 +408,84 @@ export const HomeDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Monday to Sunday Circular Day Indicators */}
+            {/* Monday to Sunday Repeating Weekly Plan Schedule */}
             <div>
               <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-[#6B7280] mb-2.5">
-                <span>Monday – Sunday Schedule</span>
-                <span className="text-[#E53935]">30m / Day Target</span>
+                <span>Monday – Sunday Repeating Plan</span>
+                <span className="text-[#E53935]">Tap Day to Preview</span>
               </div>
 
               <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
-                {realWeekly
-                  ? realWeekly.days.map((day) => {
-                      const isCompleted = day.workoutsCount > 0;
-                      const isToday = day.isToday;
+                {REPEATING_WEEKLY_SCHEDULE.map((schedDay, idx) => {
+                  const dayBucket = currentWeekActivity.days[idx];
+                  const isCompleted = hasRealHistory
+                    ? dayBucket.workoutsCount > 0
+                    : WEEKLY_ACTIVITY_SAMPLE.days[idx]?.status === 'completed';
+                  const isRealToday = schedDay.jsDayOfWeek === todayJsDay;
+                  const isSelected = schedDay.jsDayOfWeek === selectedJsDay;
+                  const assignedPlan =
+                    WORKOUT_PLANS_DATA.find((p) => p.id === schedDay.planId) ||
+                    WORKOUT_PLANS_DATA[0];
 
-                      return (
-                        <div
-                          key={day.dateKey}
-                          className={`flex flex-col items-center py-2.5 px-1 rounded-[10px] border transition-all ${
-                            isToday
-                              ? 'bg-[#FEF2F2] border-[#E53935] ring-1 ring-[#E53935]/20'
-                              : isCompleted
-                              ? 'bg-white border-[#E5E7EB]'
-                              : 'bg-[#F8FAFC] border-[#F1F5F9]'
-                          }`}
-                        >
-                          <span
-                            className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${
-                              isToday
-                                ? 'text-[#E53935]'
-                                : isCompleted
-                                ? 'text-[#111827]'
-                                : 'text-[#6B7280]'
-                            }`}
-                          >
-                            {day.dayShort}
-                          </span>
+                  return (
+                    <button
+                      key={schedDay.dayShort}
+                      type="button"
+                      onClick={() => setSelectedJsDay(schedDay.jsDayOfWeek)}
+                      className={`flex flex-col items-center py-2.5 px-1 rounded-[10px] border transition-all ${
+                        isSelected
+                          ? 'bg-[#FEF2F2] border-2 border-[#E53935] shadow-hf-xs'
+                          : isRealToday
+                          ? 'bg-[#FEF2F2]/50 border-[#FECACA]'
+                          : isCompleted
+                          ? 'bg-white border-[#E5E7EB]'
+                          : 'bg-[#F8FAFC] border-[#F1F5F9] hover:border-[#D1D5DB]'
+                      }`}
+                    >
+                      <span
+                        className={`text-[10px] font-bold uppercase tracking-wider mb-1.5 ${
+                          isSelected || isRealToday
+                            ? 'text-[#E53935]'
+                            : isCompleted
+                            ? 'text-[#111827]'
+                            : 'text-[#6B7280]'
+                        }`}
+                      >
+                        {schedDay.dayShort}
+                      </span>
 
-                          <div className="relative w-9 h-9 flex items-center justify-center mb-1.5">
-                            {isCompleted ? (
-                              <div className="w-8 h-8 rounded-full bg-[#E53935] text-white flex items-center justify-center shadow-hf-xs">
-                                <CheckCircle2 className="w-4 h-4" strokeWidth={2.5} />
-                              </div>
-                            ) : isToday ? (
-                              <div className="w-8 h-8 rounded-full border-2 border-[#E53935] bg-white flex items-center justify-center font-mono tabular-nums text-[10px] font-extrabold text-[#E53935]">
-                                {day.dateNumber}
-                              </div>
-                            ) : (
-                              <div className="w-8 h-8 rounded-full border border-[#D1D5DB] bg-white flex items-center justify-center font-mono tabular-nums text-[11px] font-semibold text-[#9CA3AF]">
-                                {day.dateNumber}
-                              </div>
-                            )}
+                      <div className="relative w-9 h-9 flex items-center justify-center mb-1.5">
+                        {isCompleted ? (
+                          <div className="w-8 h-8 rounded-full bg-[#E53935] text-white flex items-center justify-center shadow-hf-xs">
+                            <CheckCircle2 className="w-4 h-4" strokeWidth={2.5} />
                           </div>
-
-                          <span
-                            className={`font-mono tabular-nums text-[10px] font-bold ${
-                              isCompleted
-                                ? 'text-[#E53935]'
-                                : isToday
-                                ? 'text-[#C62828]'
-                                : 'text-[#9CA3AF]'
-                            }`}
-                          >
-                            {isCompleted
-                              ? `${day.totalMinutes}m`
-                              : isToday
-                              ? 'Today'
-                              : '—'}
-                          </span>
-                        </div>
-                      );
-                    })
-                  : WEEKLY_ACTIVITY_SAMPLE.days.map((day) => {
-                      const isCompleted = day.status === 'completed';
-                      const isToday = day.status === 'today';
-
-                      return (
-                        <div
-                          key={day.dayShort}
-                          className={`flex flex-col items-center py-2.5 px-1 rounded-[10px] border transition-all ${
-                            isToday
-                              ? 'bg-[#FEF2F2] border-[#E53935] ring-1 ring-[#E53935]/20'
-                              : isCompleted
-                              ? 'bg-white border-[#E5E7EB]'
-                              : 'bg-[#F8FAFC] border-[#F1F5F9]'
-                          }`}
-                        >
-                          <span
-                            className={`text-[10px] font-bold uppercase tracking-wider mb-2 ${
-                              isToday
-                                ? 'text-[#E53935]'
-                                : isCompleted
-                                ? 'text-[#111827]'
-                                : 'text-[#6B7280]'
-                            }`}
-                          >
-                            {day.dayShort}
-                          </span>
-
-                          {/* Circular Day Progress Ring */}
-                          <div className="relative w-9 h-9 flex items-center justify-center mb-1.5">
-                            {isCompleted ? (
-                              <div className="w-8 h-8 rounded-full bg-[#E53935] text-white flex items-center justify-center shadow-hf-xs">
-                                <CheckCircle2 className="w-4 h-4" strokeWidth={2.5} />
-                              </div>
-                            ) : isToday ? (
-                              <div className="w-8 h-8 rounded-full border-2 border-[#E53935] bg-white flex items-center justify-center font-mono tabular-nums text-[10px] font-extrabold text-[#E53935]">
-                                30m
-                              </div>
-                            ) : (
-                              <div className="w-8 h-8 rounded-full border border-[#D1D5DB] bg-white flex items-center justify-center font-mono tabular-nums text-[11px] font-semibold text-[#9CA3AF]">
-                                {day.dateNumber}
-                              </div>
-                            )}
+                        ) : isSelected || isRealToday ? (
+                          <div className="w-8 h-8 rounded-full border-2 border-[#E53935] bg-white flex items-center justify-center font-mono tabular-nums text-[10px] font-extrabold text-[#E53935]">
+                            {schedDay.isRestDay ? 'Rest' : `${assignedPlan.durationMinutes}m`}
                           </div>
+                        ) : (
+                          <div className="w-8 h-8 rounded-full border border-[#D1D5DB] bg-white flex items-center justify-center font-mono tabular-nums text-[10px] font-semibold text-[#6B7280]">
+                            {schedDay.isRestDay ? 'Rest' : `${assignedPlan.durationMinutes}m`}
+                          </div>
+                        )}
+                      </div>
 
-                          <span
-                            className={`font-mono tabular-nums text-[10px] font-bold ${
-                              isCompleted
-                                ? 'text-[#E53935]'
-                                : isToday
-                                ? 'text-[#C62828]'
-                                : 'text-[#9CA3AF]'
-                            }`}
-                          >
-                            {isCompleted ? '30m' : isToday ? 'Today' : '—'}
-                          </span>
-                        </div>
-                      );
-                    })}
+                      <span
+                        className={`text-[9px] font-bold truncate max-w-full px-0.5 ${
+                          isSelected || isRealToday
+                            ? 'text-[#E53935]'
+                            : isCompleted
+                            ? 'text-[#111827]'
+                            : 'text-[#6B7280]'
+                        }`}
+                      >
+                        {schedDay.isRestDay
+                          ? 'Stretch'
+                          : assignedPlan.primaryCategory.split(' ')[0]}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
