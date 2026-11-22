@@ -24,6 +24,7 @@ import {
 
 export const APP_NAV_ITEMS: NavItemSpec[] = [
   { id: 'today', label: 'Home', icon: Home },
+  { id: 'weekly-plan', label: 'Weekly Plan', icon: Calendar, badge: '7d' },
   { id: 'workouts', label: 'Workouts', icon: Play, badge: '30m' },
   { id: 'exercises', label: 'Exercises', icon: Dumbbell },
   { id: 'progress', label: 'Progress', icon: BarChart3 },
@@ -32,6 +33,7 @@ export const APP_NAV_ITEMS: NavItemSpec[] = [
 
 const ROUTE_TO_TAB: Record<string, NavItemId> = {
   '/': 'today',
+  '/weekly-plan': 'weekly-plan',
   '/workouts': 'workouts',
   '/exercises': 'exercises',
   '/progress': 'progress',
@@ -40,6 +42,7 @@ const ROUTE_TO_TAB: Record<string, NavItemId> = {
 
 const TAB_TO_ROUTE: Record<NavItemId, string> = {
   today: '/',
+  'weekly-plan': '/weekly-plan',
   workouts: '/workouts',
   exercises: '/exercises',
   progress: '/progress',
@@ -57,6 +60,9 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   // Determine active tab from current pathname
   const resolveActiveTab = (): NavItemId => {
     const path = location.pathname;
+    if (path.startsWith('/weekly-plan')) {
+      return 'weekly-plan';
+    }
     if (path.startsWith('/workout/active') || path.startsWith('/workouts')) {
       return 'workouts';
     }
@@ -147,6 +153,20 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
             {/* Right: Online/Offline Status + Install App / Guide + Current Date + Profile Icon */}
             <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+              {/* Quick Weekly Plan Button in Top Header */}
+              <button
+                type="button"
+                onClick={() => navigate('/weekly-plan')}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] border text-[12px] font-bold transition-all ${
+                  activeTab === 'weekly-plan'
+                    ? 'bg-[#E53935] text-white border-[#E53935] shadow-hf-red'
+                    : 'bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#E53935] border-[#FECACA]'
+                }`}
+              >
+                <Calendar className="w-3.5 h-3.5 shrink-0" strokeWidth={2.25} />
+                <span>Weekly Plan</span>
+              </button>
+
               {/* Small Connection Status Indicator (Online / Offline) */}
               <ConnectionStatusPill />
 

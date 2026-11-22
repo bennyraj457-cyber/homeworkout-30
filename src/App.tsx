@@ -10,6 +10,11 @@ import {
 } from './pages/PlaceholderScreens';
 
 // Route-level code splitting for fast initial mobile load
+const WeeklyPlanPage = lazy(() =>
+  import('./pages/WeeklyPlanPage').then((mod) => ({
+    default: mod.WeeklyPlanPage,
+  }))
+);
 const WorkoutLibrary = lazy(() =>
   import('./pages/WorkoutLibrary').then((mod) => ({
     default: mod.WorkoutLibrary,
@@ -104,6 +109,16 @@ export function App() {
             element={
               <AppShell>
                 <HomeDashboard />
+              </AppShell>
+            }
+          />
+
+          {/* Dedicated Repeating 7-Day Weekly Plan Page */}
+          <Route
+            path="/weekly-plan"
+            element={
+              <AppShell>
+                <WeeklyPlanPage />
               </AppShell>
             }
           />

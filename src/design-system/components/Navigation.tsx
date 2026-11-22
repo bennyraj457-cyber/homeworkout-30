@@ -13,7 +13,13 @@ import {
   LucideIcon,
 } from 'lucide-react';
 
-export type NavItemId = 'today' | 'workouts' | 'exercises' | 'progress' | 'profile';
+export type NavItemId =
+  | 'today'
+  | 'weekly-plan'
+  | 'workouts'
+  | 'exercises'
+  | 'progress'
+  | 'profile';
 
 export interface NavItemSpec {
   id: NavItemId;
@@ -24,6 +30,7 @@ export interface NavItemSpec {
 
 export const DEFAULT_NAV_ITEMS: NavItemSpec[] = [
   { id: 'today', label: 'Today', icon: Home },
+  { id: 'weekly-plan', label: 'Weekly Plan', icon: Calendar, badge: '7d' },
   { id: 'workouts', label: '30-Min Plan', icon: Play, badge: '30m' },
   { id: 'exercises', label: 'Exercises', icon: Dumbbell },
   { id: 'progress', label: 'Analytics', icon: BarChart3 },
