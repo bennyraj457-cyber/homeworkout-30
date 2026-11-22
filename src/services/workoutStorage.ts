@@ -364,6 +364,32 @@ export function clearActiveWorkoutSession(): void {
 }
 
 /**
+ * Reset all workout data, active sessions, history, and optionally unregister service workers / caches
+ */
+export async function resetAllWorkoutDataAndCaches(): Promise<void> {
+  try {
+    localStorage.removeItem(STORAGE_KEYS.ACTIVE_SESSION);
+    localStorage.removeItem(STORAGE_KEYS.WORKOUT_HISTORY);
+    localStorage.removeItem(STORAGE_KEYS.PERSONAL_GOALS);
+
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      for (const reg of registrations) {
+        await reg.unregister();
+      }
+    }
+    if ('caches' in window) {
+      const cacheKeys = await caches.keys();
+      for (const key of cacheKeys) {
+        await caches.delete(key);
+      }
+    }
+  } catch {
+    // Ignore cleanup errors
+  }
+}
+
+/**
  * Reconstruct exercise-by-exercise details if a legacy history entry lacks `exercises`
  */
 export function getExerciseDetailsForHistoryEntry(

@@ -1177,14 +1177,15 @@ export const ActiveWorkout: React.FC = () => {
               {session.isPaused ? 'Resume Workout' : 'Pause'}
             </Button>
 
-            {/* Reset Workout Button */}
-            <IconButton
-              label="Reset Workout Session"
-              variant="subtle"
+            {/* Reset Workout Button (With Visible Label) */}
+            <Button
+              variant="outline"
               size="md"
               onClick={() => setShowResetModal(true)}
-              icon={<RotateCcw className="w-4 h-4" strokeWidth={2.25} />}
-            />
+              leftIcon={<RotateCcw className="w-4 h-4 text-[#E53935]" strokeWidth={2.25} />}
+            >
+              Reset
+            </Button>
 
             {/* Finish Workout Button */}
             <Button

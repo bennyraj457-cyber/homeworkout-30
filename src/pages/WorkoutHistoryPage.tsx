@@ -20,6 +20,7 @@ import {
   Sliders,
   Check,
   Sparkles,
+  RotateCcw,
 } from 'lucide-react';
 import { Button } from '../design-system/components/Buttons';
 import { StatisticsCard } from '../design-system/components/Cards';
@@ -30,6 +31,7 @@ import {
 import {
   EmptyState,
   SuccessMessage,
+  ConfirmationDialog,
 } from '../design-system/components/FeedbackComponents';
 import {
   loadCompletedWorkoutHistory,
@@ -40,6 +42,7 @@ import {
   calculateWeeklyActivity,
   calculateMonthlyProgress,
   formatSecondsToMMSS,
+  resetAllWorkoutDataAndCaches,
 } from '../services/workoutStorage';
 import {
   CompletedWorkoutHistoryEntry,
@@ -77,6 +80,7 @@ export const WorkoutHistoryPage: React.FC = () => {
     loadPersonalGoals()
   );
   const [goalSavedBanner, setGoalSavedBanner] = useState(false);
+  const [showProgressResetModal, setShowProgressResetModal] = useState(false);
 
   // Sync on mount and if localStorage changes across tabs
   useEffect(() => {
@@ -252,7 +256,15 @@ export const WorkoutHistoryPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 self-start sm:self-center">
+          <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center">
+            <Button
+              variant="outline"
+              size="md"
+              onClick={() => setShowProgressResetModal(true)}
+              leftIcon={<RotateCcw className="w-4 h-4 text-[#E53935]" />}
+            >
+              Reset Progress
+            </Button>
             <Button
               variant="primary"
               size="md"
@@ -1164,6 +1176,24 @@ export const WorkoutHistoryPage: React.FC = () => {
           </div>
         )}
       </section>
+
+      {showProgressResetModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[1px] flex items-center justify-center p-4">
+          <ConfirmationDialog
+            title="Reset All Progress & Workout History?"
+            description="This will clear all completed workout records, reset active workout progress, and restore default weekly goals."
+            confirmLabel="Reset Progress"
+            cancelLabel="Cancel"
+            onConfirm={async () => {
+              await resetAllWorkoutDataAndCaches();
+              setHistory([]);
+              setGoals(loadPersonalGoals());
+              setShowProgressResetModal(false);
+            }}
+            onCancel={() => setShowProgressResetModal(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };

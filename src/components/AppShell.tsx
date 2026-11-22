@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Home,
@@ -8,6 +8,7 @@ import {
   User,
   Palette,
   Calendar,
+  RotateCcw,
 } from 'lucide-react';
 import {
   MobileBottomNav,
@@ -15,6 +16,8 @@ import {
   NavItemId,
   NavItemSpec,
 } from '../design-system/components/Navigation';
+import { ConfirmationDialog } from '../design-system/components/FeedbackComponents';
+import { resetAllWorkoutDataAndCaches } from '../services/workoutStorage';
 import {
   ConnectionStatusPill,
   HeaderInstallAction,
@@ -56,6 +59,13 @@ export interface AppShellProps {
 export const AppShell: React.FC<AppShellProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showGlobalResetModal, setShowGlobalResetModal] = useState(false);
+
+  const handleConfirmGlobalReset = async () => {
+    await resetAllWorkoutDataAndCaches();
+    setShowGlobalResetModal(false);
+    window.location.href = '/';
+  };
 
   // Determine active tab from current pathname
   const resolveActiveTab = (): NavItemId => {
@@ -101,8 +111,22 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
             onSelect={handleSelectTab}
             items={APP_NAV_ITEMS}
           />
-          {/* Extra Footer Link in Sidebar to view UI Design System */}
-          <div className="px-4 pb-4 bg-white border-r border-[#E5E7EB]">
+          {/* Extra Footer Links in Sidebar: Reset Data & UI Design System */}
+          <div className="px-4 pb-4 space-y-2 bg-white border-r border-[#E5E7EB]">
+            <button
+              type="button"
+              onClick={() => setShowGlobalResetModal(true)}
+              className="w-full flex items-center justify-between px-3 py-2 rounded-[8px] bg-[#FEF2F2] hover:bg-[#FEE2E2] border border-[#FECACA] text-[12px] font-bold text-[#E53935] transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <RotateCcw className="w-3.5 h-3.5 text-[#E53935]" />
+                <span>Reset All Data</span>
+              </span>
+              <span className="text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded bg-white border border-[#FECACA]">
+                Clear
+              </span>
+            </button>
+
             <button
               type="button"
               onClick={() => navigate('/design-system')}
@@ -167,6 +191,17 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
                 <span>Weekly Plan</span>
               </button>
 
+              {/* Reset Button in Top Header */}
+              <button
+                type="button"
+                onClick={() => setShowGlobalResetModal(true)}
+                title="Reset Workout Progress, History & Cache"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[8px] bg-white hover:bg-[#FEF2F2] border border-[#E5E7EB] hover:border-[#FECACA] text-[12px] font-bold text-[#4B5563] hover:text-[#E53935] transition-colors"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-[#E53935]" strokeWidth={2.25} />
+                <span>Reset</span>
+              </button>
+
               {/* Small Connection Status Indicator (Online / Offline) */}
               <ConnectionStatusPill />
 
@@ -216,6 +251,20 @@ export const AppShell: React.FC<AppShellProps> = ({ children }) => {
 
       {/* Browser Installation Instructions Modal */}
       <InstallInstructionsModal />
+
+      {/* Global Reset Confirmation Dialog */}
+      {showGlobalResetModal && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[1px] flex items-center justify-center p-4">
+          <ConfirmationDialog
+            title="Reset All Workout Data & Cache?"
+            description="This will reset any active workout session, clear saved workout history, restore default weekly goals, and refresh the app cache."
+            confirmLabel="Reset Everything"
+            cancelLabel="Cancel"
+            onConfirm={handleConfirmGlobalReset}
+            onCancel={() => setShowGlobalResetModal(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };

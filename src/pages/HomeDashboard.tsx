@@ -18,6 +18,7 @@ import {
   Download,
   Smartphone,
   Check,
+  RotateCcw,
 } from 'lucide-react';
 import { usePwa } from '../context/PwaContext';
 import { Button } from '../design-system/components/Buttons';
@@ -45,7 +46,10 @@ import {
   calculateWeeklyActivity,
   loadPersonalGoals,
   formatSecondsToMMSS,
+  clearActiveWorkoutSession,
+  resetAllWorkoutDataAndCaches,
 } from '../services/workoutStorage';
+import { ConfirmationDialog } from '../design-system/components/FeedbackComponents';
 
 const CATEGORY_ICON_MAP: Record<MuscleCategorySlug, React.ReactNode> = {
   chest: <Shield className="w-5 h-5" strokeWidth={2.25} />,
@@ -74,6 +78,8 @@ export const HomeDashboard: React.FC = () => {
   // Allow user to click any day (MON–SUN) in the repeating weekly plan to preview/start that day right from the top hero card
   const todayJsDay = new Date().getDay();
   const [selectedJsDay, setSelectedJsDay] = useState<number>(todayJsDay);
+  const [showDashboardResetConfirm, setShowDashboardResetConfirm] =
+    useState(false);
 
   const savedSession = loadActiveWorkoutSession();
   const hasActiveUnfinishedSession =
@@ -153,15 +159,27 @@ export const HomeDashboard: React.FC = () => {
               {formatSecondsToMMSS(savedSession.accumulatedElapsedSeconds)}
             </p>
           </div>
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={() => navigate('/workout/active')}
-            leftIcon={<Play className="w-4 h-4 fill-current" />}
-            className="shrink-0"
-          >
-            Resume Workout
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => {
+                clearActiveWorkoutSession();
+                window.location.reload();
+              }}
+              leftIcon={<RotateCcw className="w-4 h-4 text-[#E53935]" />}
+            >
+              Reset
+            </Button>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => navigate('/workout/active')}
+              leftIcon={<Play className="w-4 h-4 fill-current" />}
+            >
+              Resume Workout
+            </Button>
+          </div>
         </section>
       )}
       {/* =====================================================================
@@ -332,6 +350,15 @@ export const HomeDashboard: React.FC = () => {
                 className="shrink-0"
               >
                 View Details
+              </Button>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => setShowDashboardResetConfirm(true)}
+                leftIcon={<RotateCcw className="w-4 h-4 text-[#E53935]" />}
+                className="shrink-0"
+              >
+                Reset
               </Button>
             </div>
           </div>
@@ -976,6 +1003,23 @@ export const HomeDashboard: React.FC = () => {
           )}
         </div>
       </section>
+
+      {showDashboardResetConfirm && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[1px] flex items-center justify-center p-4">
+          <ConfirmationDialog
+            title="Reset All Workout Progress & History?"
+            description="This will reset your current workout progress, clear saved workout history, and refresh the app."
+            confirmLabel="Reset Now"
+            cancelLabel="Cancel"
+            onConfirm={async () => {
+              await resetAllWorkoutDataAndCaches();
+              setShowDashboardResetConfirm(false);
+              window.location.href = '/';
+            }}
+            onCancel={() => setShowDashboardResetConfirm(false)}
+          />
+        </div>
+      )}
     </div>
   );
 };
